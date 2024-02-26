@@ -1,5 +1,9 @@
 [MAIN]
     disable = W0104, # pointless-statement
+              W0611, # unused-import
+              W0141, # bad-builtin
+              W0718, # broad-exception-caught
+              W0717, # too-many-try-statements
 
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().

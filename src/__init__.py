@@ -7,6 +7,3 @@
     Esse módulo existe apenas para inicializar a pasta src e, com isso, facilitar as
     importações para os módulos que estão fora desse (src).
 '''
-
-from src import imports
-from src import defs

@@ -7,18 +7,25 @@
     Módulo criado para definir os Padrões de E-mail que serão importados para as funções
     que enviam, de fato, os e-mails
 '''
+import base64
+
 LINK_STAGE01 = 'https://forms.gle/AWaCYXJK44j2z55AA' # Change the link when you need
 data_limite = 'XX/XX/XXXX' # Put the correct date here
 
 # Texto da primeira etapa
-def realizacao_primeira_etapa(nome_candidato: str) -> None:
+def realizacao_primeira_etapa(nome_candidato: str) -> str:
     '''
     EN: Function to be pulled and insert the name of a candidate
     PT: Função para ser puxada e inserir o nome de um candidato
     '''
+    with open("./docs/imgs/Banner.png", 'rb') as image_file:
+        image_data = image_file.read()
+        image_base64 = base64.b64encode(image_data).decode("utf-8")
+
+    return (
     f'''
     <p align="center">
-        <img aling="center" src="../imgs/Banner.png">
+        <img src="data:image/png;base64,{image_base64}">
     </p>
 
     <br>
@@ -38,5 +45,6 @@ def realizacao_primeira_etapa(nome_candidato: str) -> None:
     <p> Estamos torcendo pelo seu sucesso e estamos à disposição para esclarecer qualquer dúvida que possa 
     surgir. Boa sorte &#128521; &#128640;</p>
 
-    <p> <b>Link para a etapa 1:</b> <a>{LINK_STAGE01}</a></p>
+    <p> <b>Link para a etapa 1:</b> <a href="https://forms.gle/AWaCYXJK44j2z55AA">{LINK_STAGE01}</a></p>
     '''
+    )
