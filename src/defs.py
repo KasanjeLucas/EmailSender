@@ -16,7 +16,7 @@ import pandas as pd # Module responsible to read the data
 
 from docs.EmailPatterns.patterns import realizacao_primeira_etapa # Function to send the first email pattern
 
-def send_email() -> None:
+def send_email(your_email:str, app_key: str) -> None:
     '''
     EN:
     Function responsible to send, in fact, the e-mail
@@ -30,8 +30,8 @@ def send_email() -> None:
     while flag:
         print("\n\t -=-=-=-=-=-=-=-=-=- Pattern Selection -=-=-=-=-=-=-=-=-=-\n\n")
         option = input("\tDigite a opção de email a qual deseja enviar: \n"
-                       + "[1] - E-mail para etapa 1 (pós-inscrição no PS);"
-                       + "[0] - Sair")
+                       + "[1] - E-mail para etapa 1 (pós-inscrição no PS);\n"
+                       + "[0] - Sair\n\n>>> ")
         
         try:
             int_option = int(option)
@@ -55,8 +55,6 @@ def send_email() -> None:
             os.system('cls')
             print('\n\tOpção selecionada: E-mail para a etapa 1\n\n')
 
-# ------------------------- OBSERVAR, PODE VIRAR UMA ÚNICA FUNÇÃO FORA DAQUI EM -------------------------
-
             dataframe = pd.read_csv('./docs/inscricoes.csv')
             formated_dataframe = dataframe.drop(columns=['Carimbo de data/hora','Endereço de e-mail',
                                                          '📞 Qual é o seu WhatsApp? (Contato de emergência)',
@@ -79,21 +77,17 @@ def send_email() -> None:
                     
                     if i == 2:
                         email_list.append(needed_value)
-            
-# ----------------------------------------------------------------------------------------------------------
 
-# ---------------------------------- OUTRA QUE PODE VIRAR FUNÇÃO AQUI --------------------------------------
-            
-            # Criando a mensagem e enviando!!!!!!!!!!!!!!
-            your_password = '...' # App-Key here
+            # -=-=-=-=-=-=-=- Creating the message and sending it! -=-=-=-=-=-=-=-
+            your_password = f'{app_key}' # App-Key here
 
             for i, email in enumerate(email_list):
                 message = MIMEMultipart() # Creation of an instance of MIMEMultipart Class
-                message['From'] = '...' # PUT THE E-MAIL THAT YOU ARE WORKING HERE
+                message['From'] = f'{your_email}' # Putting the email that you're working with
                 message['To'] = email # As we're iterating in a email list, the current one is the addressee
                 message['Subject'] = "Processo Seletivo 24.1" # Just put the subject here
 
-                # Creating the body_message
+                # -=-=-=-=-=-=-=- Creating the body_message -=-=-=-=-=-=-=-
 
                 # Checking if the candidate has or not a nickname
 
@@ -105,6 +99,15 @@ def send_email() -> None:
                 # Specifying the kind of message content
                 message.attach(MIMEText(body_message, 'html'))
 
+                # Creating a MIMEApplication to attach an external document
+
+                file = r'./docs/Apresentacao.pdf'
+                with open(file, 'rb') as f:
+                    attachment = MIMEApplication(f.read(), _subtype='pdf')
+                
+                # Attaching the file
+                attachment.add_header('content_disposition', 'attachment', filename='Apresentação.pdf')
+                message.attach(attachment)
 
                 # Stablishing the connection
                 connection = smtplib.SMTP('smtp.gmail.com', 587)

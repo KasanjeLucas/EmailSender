@@ -10,7 +10,7 @@
 import base64
 
 LINK_STAGE01 = 'https://forms.gle/AWaCYXJK44j2z55AA' # Change the link when you need
-data_limite = 'XX/XX/XXXX' # Put the correct date here
+data_limite = '23/03/2024' # Put the correct date here
 
 # Texto da primeira etapa
 def realizacao_primeira_etapa(nome_candidato: str) -> str:
@@ -18,18 +18,8 @@ def realizacao_primeira_etapa(nome_candidato: str) -> str:
     EN: Function to be pulled and insert the name of a candidate
     PT: Função para ser puxada e inserir o nome de um candidato
     '''
-    with open("./docs/imgs/Banner.png", 'rb') as image_file:
-        image_data = image_file.read()
-        image_base64 = base64.b64encode(image_data).decode("utf-8")
-
     return (
     f'''
-    <p align="center">
-        <img src="data:image/png;base64,{image_base64}">
-    </p>
-
-    <br>
-
     <p>Olá {nome_candidato}!! Esperamos que você esteja bem. </p>
     <p>Estamos muito felizes com o entusiasmo que você demonstrou em relação à oportunidade de participar 
     do nosso processo seletivo.</p>
