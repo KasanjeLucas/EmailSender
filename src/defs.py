@@ -34,20 +34,9 @@ def create_and_format_pattern1(path: str) -> list:
                                                 '📄 Qual é o link do seu LinkedIn? (opcional)',
                                                 '👁️ Como você ficou sabendo do PS?'])
             
-    full_name_list = []
-    nickname_list = []
-    email_list = []
-
-    for value in formated_dataframe.values:
-        for i, needed_value in enumerate(value):
-            if i == 0:
-                full_name_list.append(needed_value)
-                    
-            if i == 1:
-                nickname_list.append(needed_value)
-                    
-            if i == 2:
-                email_list.append(needed_value)
+    full_name_list = formated_dataframe.iloc[:, 0].tolist()
+    nickname_list = formated_dataframe.iloc[:, 1].tolist()
+    email_list = formated_dataframe.iloc[:, 2].tolist()
     
     return [full_name_list, nickname_list, email_list]
 
