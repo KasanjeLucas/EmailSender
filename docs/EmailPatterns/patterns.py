@@ -59,3 +59,40 @@ def lembrete_primeira_etapa() -> str:
         <p> <b>Link para a etapa 1:</b> <a href="https://forms.gle/AWaCYXJK44j2z55AA">{LINK_STAGE01}</a></p>
         '''
     )
+
+def aprovacao_primeira_etapa(nome_candidato: str, discord_link: str) -> str:
+    '''
+    EN: Function that returns the body-text relative to the approvement text
+    PT: Função que retorna o body-text relativo ao texto de aprovação na primeira etapa
+    '''
+    return (f'''
+    <p>Olá, {nome_candidato}!! Esperamos que você esteja bem.</p>
+
+    <p>A primeira etapa do nosso processo seletivo acabou e gostaríamos de falar que você foi aprovado!!! &#129395;</p> 
+
+    <p>Estamos muito felizes com o entusiasmo que você demonstrou em relação à oportunidade de participar 
+    do nosso processo seletivo.</p>
+
+    <p>Agora, para as próximas etapas, precisamos que você entre no seguinte servidor do discord: 
+    {discord_link}</p>
+
+    <p>Lembrando que <b>quem não entrar será desclassificado...</b></p>
+
+    <p>A partir de agora, você está cada vez mais perto de se tornar um for_coder!</p>
+
+    <p>Estamos ansiosos para as próximas etapas e para poder conhecer um pouquinho mais de você! &#128156;&#128156;</p>
+
+''')
+
+def reprovacao_primeira_etapa(nome_candidato: str) -> str:
+    '''
+    EN: Function that returns the body-text relative to the reprobation text
+    PT: Função que retorna o body-text relativo ao texto de reprovação na primeira etapa
+    '''
+    return (f'''
+    <p>Olá, {nome_candidato}!! Esperamos que você esteja bem.</p>
+    <p>A primeira etapa do nosso processo seletivo acabou e gostaríamos de falar que, infelizmente, não foi dessa vez... &#128546;</p>
+    <p>Estamos mandando um feedback desse PS para que você possa ver seus pontos mais fracos e melhorá-los da próxima vez.</p>
+
+    <p>Agradecemos a sua participação no nosso processo seletivo e estaremos te aguardando para o próximo! &#128156;</p> 
+''')

@@ -41,21 +41,28 @@ def create_and_format_pattern1(path: str) -> list:
     return [full_name_list, nickname_list, email_list]
 
 def connect(email_login: str, password: str, adressee: str, message: MIMEMultipart) -> None:
+    '''
+    EN:
+    Function responsible for creating the connection and allowing the send of a e-mail message
+    PT:
+    Função responsável por criar a conexão e permitir o envio de uma mensagem de e-mail
+    '''
+
     # Stablishing the connection
-                connection = smtplib.SMTP('smtp.gmail.com', 587)
-                connection.starttls()
+    connection = smtplib.SMTP('smtp.gmail.com', 587)
+    connection.starttls()
 
-                # Logging in
-                connection.login(email_login, password)
+    # Logging in
+    connection.login(email_login, password)
 
-                # Sending the e-mail
-                connection.sendmail(email_login, adressee, message.as_string())
+    # Sending the e-mail
+    connection.sendmail(email_login, adressee, message.as_string())
                 
-                # Reseting the instance
-                del(message)
+    # Reseting the instance
+    del(message)
 
-                # Finishing the session
-                connection.quit()
+    # Finishing the session
+    connection.quit()
 
 def send_email(your_email:str, app_key: str) -> None:
     '''
