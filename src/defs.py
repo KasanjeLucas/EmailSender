@@ -31,6 +31,7 @@ def send_email(your_email:str, app_key: str) -> None:
         print("\n\t -=-=-=-=-=-=-=-=-=- Pattern Selection -=-=-=-=-=-=-=-=-=-\n\n")
         option = input("\tDigite a opção de email a qual deseja enviar: \n"
                        + "[1] - E-mail para etapa 1 (pós-inscrição no PS);\n"
+                       + "[2] - E-mail  de lembrete etapa 1;\n"
                        + "[0] - Sair\n\n>>> ")
         
         try:
@@ -120,12 +121,9 @@ def send_email(your_email:str, app_key: str) -> None:
                 connection.sendmail(message['From'], message['To'], message.as_string())
                 
                 # Reseting the instance
-                del message
+                del(message)
 
                 # Finishing the session
                 connection.quit()
 
                 print(f'Email enviado com sucesso para {email}')
-                    
-
-

@@ -38,3 +38,24 @@ def realizacao_primeira_etapa(nome_candidato: str) -> str:
     <p> <b>Link para a etapa 1:</b> <a href="https://forms.gle/AWaCYXJK44j2z55AA">{LINK_STAGE01}</a></p>
     '''
     )
+
+# Texto de lembrete da primeira etapa
+def lembrete_primeira_etapa(nome_candidato: str) -> str:
+    '''
+    EN: Function that returns the body-text relative to the text reminder
+    PT: Função que retorna o body-text relativo ao texto de lembrete
+    '''
+    return (
+        f'''
+        <p>Olá! Tudo bem? </p>
+        <p> Percebemos que muitas pessoas ainda não responderam à etapa 1 &#129402;. 
+        Gostaríamos de lembrar apenas da importância de respondê-lo e ressaltar que ele ficará aberto 
+        até o dia {data_limite}.</p>
+        <br>
+        <p>Obs.: Caso você já tenha respondido, apenas desconsidere este e-mail.</p>
+
+        Estamos ansiosos pelas respostas &#128521;.
+
+        <p> <b>Link para a etapa 1:</b> <a href="https://forms.gle/AWaCYXJK44j2z55AA">{LINK_STAGE01}</a></p>
+        '''
+    )
