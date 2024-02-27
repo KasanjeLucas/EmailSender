@@ -40,6 +40,23 @@ def create_and_format_pattern1(path: str) -> list:
     
     return [full_name_list, nickname_list, email_list]
 
+def connect(email_login: str, password: str, adressee: str, message: MIMEMultipart) -> None:
+    # Stablishing the connection
+                connection = smtplib.SMTP('smtp.gmail.com', 587)
+                connection.starttls()
+
+                # Logging in
+                connection.login(email_login, password)
+
+                # Sending the e-mail
+                connection.sendmail(email_login, adressee, message.as_string())
+                
+                # Reseting the instance
+                del(message)
+
+                # Finishing the session
+                connection.quit()
+
 def send_email(your_email:str, app_key: str) -> None:
     '''
     EN:
@@ -116,21 +133,8 @@ def send_email(your_email:str, app_key: str) -> None:
                 attachment.add_header('content_disposition', 'attachment', filename='Apresentação.pdf')
                 message.attach(attachment)
 
-                # Stablishing the connection
-                connection = smtplib.SMTP('smtp.gmail.com', 587)
-                connection.starttls()
-
-                # Logging in
-                connection.login(message['From'], your_password)
-
-                # Sending the e-mail
-                connection.sendmail(message['From'], message['To'], message.as_string())
-                
-                # Reseting the instance
-                del(message)
-
-                # Finishing the session
-                connection.quit()
+                # Making the connection
+                connect(your_email, your_password, message['To'], message)
 
                 print(f'Email enviado com sucesso para {email}')
 
@@ -170,20 +174,7 @@ def send_email(your_email:str, app_key: str) -> None:
                 attachment.add_header('content_disposition', 'attachment', filename='Apresentação.pdf')
                 message.attach(attachment)
 
-                # Stablishing the connection
-                connection = smtplib.SMTP('smtp.gmail.com', 587)
-                connection.starttls()
-
-                # Logging in
-                connection.login(message['From'], your_password)
-
-                # Sending the e-mail
-                connection.sendmail(message['From'], message['To'], message.as_string())
-                
-                # Reseting the instance
-                del(message)
-
-                # Finishing the session
-                connection.quit()
+                # Making the connection
+                connect(your_email, your_password, message['To'], message)
 
                 print(f'Email enviado com sucesso para {email}')
