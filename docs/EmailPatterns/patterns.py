@@ -35,7 +35,7 @@ def realizacao_primeira_etapa(nome_candidato: str) -> str:
     <p> Estamos torcendo pelo seu sucesso e estamos à disposição para esclarecer qualquer dúvida que possa 
     surgir. Boa sorte &#128521; &#128640;</p>
 
-    <p> <b>Link para a etapa 1:</b> <a href="https://forms.gle/AWaCYXJK44j2z55AA">{LINK_STAGE01}</a></p>
+    <p> <b>Link para a etapa 1:</b> <a href="{LINK_STAGE01}">{LINK_STAGE01}</a></p>
     '''
     )
 
@@ -56,7 +56,7 @@ def lembrete_primeira_etapa() -> str:
 
         Estamos ansiosos pelas respostas &#128521;.
 
-        <p> <b>Link para a etapa 1:</b> <a href="https://forms.gle/AWaCYXJK44j2z55AA">{LINK_STAGE01}</a></p>
+        <p> <b>Link para a etapa 1:</b> <a href="{LINK_STAGE01}">{LINK_STAGE01}</a></p>
         '''
     )
 
@@ -73,8 +73,8 @@ def aprovacao_primeira_etapa(nome_candidato: str, discord_link: str) -> str:
     <p>Estamos muito felizes com o entusiasmo que você demonstrou em relação à oportunidade de participar 
     do nosso processo seletivo.</p>
 
-    <p>Agora, para as próximas etapas, precisamos que você entre no seguinte servidor do discord: 
-    {discord_link}</p>
+    <p>Agora, para as próximas etapas, precisamos que você entre no seguinte <b>servidor do discord: 
+    <a href = "{discord_link}">{discord_link}</a></b></p>
 
     <p>Lembrando que <b>quem não entrar será desclassificado...</b></p>
 

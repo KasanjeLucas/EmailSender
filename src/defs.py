@@ -16,9 +16,10 @@ import pandas as pd # Module responsible to read the data
 
 from docs.EmailPatterns.patterns import realizacao_primeira_etapa # Function to send the first email pattern
 from docs.EmailPatterns.patterns import lembrete_primeira_etapa # Function to send the second email pattern
+from docs.EmailPatterns.patterns import aprovacao_primeira_etapa # Function to send the third email pattern
+from docs.EmailPatterns.patterns import reprovacao_primeira_etapa # Function to send the fourth email pattern
 
-
-def create_and_format_pattern1(path: str) -> list:
+def create_and_format_pattern(path: str) -> list:
     '''
     EN:
     Function responsible to format the needed lists to send the first pattern of e-mail
@@ -64,7 +65,7 @@ def connect(email_login: str, password: str, adressee: str, message: MIMEMultipa
     # Finishing the session
     connection.quit()
 
-def send_email(your_email:str, app_key: str) -> None:
+def send_email(your_email:str, app_key: str, discord_link:str) -> None:
     '''
     EN:
     Function responsible to send, in fact, the e-mail
@@ -80,6 +81,8 @@ def send_email(your_email:str, app_key: str) -> None:
         option = input("\tDigite a opção de email a qual deseja enviar: \n"
                        + "[1] - E-mail para etapa 1 (pós-inscrição no PS);\n"
                        + "[2] - E-mail de lembrete etapa 1;\n"
+                       + "[3] - E-mail de APROVAÇÃO etapa 1;\n"
+                       + "[4] - E-mail de REPROVAÇÃO etapa 1;\n"
                        + "[0] - Sair\n\n>>> ")
         
         try:
@@ -107,7 +110,7 @@ def send_email(your_email:str, app_key: str) -> None:
             [fullname_list,
              nickname_list,
              email_list
-            ] = create_and_format_pattern1('./docs/inscricoes.csv')
+            ] = create_and_format_pattern('./docs/spreadsheets/inscricoes.csv')
 
             # -=-=-=-=-=-=-=- Creating the message and sending it! -=-=-=-=-=-=-=-
             your_password = f'{app_key}' # App-Key here
@@ -153,7 +156,7 @@ def send_email(your_email:str, app_key: str) -> None:
             [fullname_list,
              nickname_list,
              email_list
-            ] = create_and_format_pattern1('./docs/inscricoes.csv')
+            ] = create_and_format_pattern('./docs/spreadsheets/inscricoes.csv')
 
             # -=-=-=-=-=-=-=- Creating the message and sending it! -=-=-=-=-=-=-=-
             your_password = f'{app_key}' # App-Key here
@@ -185,3 +188,80 @@ def send_email(your_email:str, app_key: str) -> None:
                 connect(your_email, your_password, message['To'], message)
 
                 print(f'Email enviado com sucesso para {email}')
+        
+        elif int_option == 3:
+            os.system('cls')
+            print('\n\tOpção selecionada: APROVAÇÃO na etapa 1\n\n')
+
+            # Receiving the needed values
+            [fullname_list,
+             nickname_list,
+             email_list
+            ] = create_and_format_pattern('./docs/spreadsheets/aprovados.csv') # arquivo
+
+            # -=-=-=-=-=-=-=- Creating the message and sending it! -=-=-=-=-=-=-=-
+            your_password = f'{app_key}' # App-Key here
+
+            for i, email in enumerate(email_list):
+                message = MIMEMultipart() # Creation of an instance of MIMEMultipart Class
+                message['From'] = f'{your_email}' # Putting the email that you're working with
+                message['To'] = email # As we're iterating in a email list, the current one is the addressee
+                message['Subject'] = "PS for_code - Resultado da 1a etapa" # Just put the subject here
+            
+            # -=-=-=-=-=-=-=- Creating the body_message -=-=-=-=-=-=-=-
+
+                 # Checking if the candidate has or not a nickname
+
+                if not pd.isnull(nickname_list[i]):
+                    body_message = aprovacao_primeira_etapa(nickname_list[i], f'{discord_link}')
+                else:
+                    body_message = aprovacao_primeira_etapa(fullname_list[i], f'{discord_link}')
+
+                # Specifying the kind of message content
+                message.attach(MIMEText(body_message, 'html'))
+
+                # Making the connection
+                connect(your_email, your_password, message['To'], message)
+
+                print(f'Email enviado com sucesso para {email}')
+        
+        elif int_option == 4:
+
+            os.system('cls')
+            print('\n\tOpção selecionada: REPROVAÇÃO na etapa 1\n\n')
+
+            # Receiving the needed values
+            [fullname_list,
+             nickname_list,
+             email_list
+            ] = create_and_format_pattern('./docs/spreadsheets/reprovados.csv') # arquivo
+
+            # -=-=-=-=-=-=-=- Creating the message and sending it! -=-=-=-=-=-=-=-
+            your_password = f'{app_key}' # App-Key here
+
+            for i, email in enumerate(email_list):
+                message = MIMEMultipart() # Creation of an instance of MIMEMultipart Class
+                message['From'] = f'{your_email}' # Putting the email that you're working with
+                message['To'] = email # As we're iterating in a email list, the current one is the addressee
+                message['Subject'] = "PS for_code - Resultado da 1a etapa" # Just put the subject here
+            
+            # -=-=-=-=-=-=-=- Creating the body_message -=-=-=-=-=-=-=-
+
+                 # Checking if the candidate has or not a nickname
+
+                if not pd.isnull(nickname_list[i]):
+                    body_message = reprovacao_primeira_etapa(nickname_list[i])
+                else:
+                    body_message = reprovacao_primeira_etapa(fullname_list[i])
+
+                # Specifying the kind of message content
+                message.attach(MIMEText(body_message, 'html'))
+
+                # Making the connection
+                connect(your_email, your_password, message['To'], message)
+
+                print(f'Email enviado com sucesso para {email}')
+        
+        else:
+            os.system('cls')
+            print('\n\tSelecione uma das opções acima!!')
