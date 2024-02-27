@@ -15,6 +15,41 @@ import pandas as pd # Module responsible to read the data
 
 
 from docs.EmailPatterns.patterns import realizacao_primeira_etapa # Function to send the first email pattern
+from docs.EmailPatterns.patterns import lembrete_primeira_etapa # Function to send the second email pattern
+
+
+def create_and_format_pattern1(path: str) -> list:
+    '''
+    EN:
+    Function responsible to format the needed lists to send the first pattern of e-mail
+
+    PT:
+    Função responsável por formatar as listas necessárias para enviar o primeiro padrão de e-mail
+    '''
+    dataframe = pd.read_csv(path)
+    formated_dataframe = dataframe.drop(columns=['Carimbo de data/hora','Endereço de e-mail',
+                                                '📞 Qual é o seu WhatsApp? (Contato de emergência)',
+                                                '💡 Qual é o seu curso?',
+                                                '🤔 É a sua primeira vez participando do processo seletivo?',
+                                                '📄 Qual é o link do seu LinkedIn? (opcional)',
+                                                '👁️ Como você ficou sabendo do PS?'])
+            
+    full_name_list = []
+    nickname_list = []
+    email_list = []
+
+    for value in formated_dataframe.values:
+        for i, needed_value in enumerate(value):
+            if i == 0:
+                full_name_list.append(needed_value)
+                    
+            if i == 1:
+                nickname_list.append(needed_value)
+                    
+            if i == 2:
+                email_list.append(needed_value)
+    
+    return [full_name_list, nickname_list, email_list]
 
 def send_email(your_email:str, app_key: str) -> None:
     '''
@@ -31,7 +66,7 @@ def send_email(your_email:str, app_key: str) -> None:
         print("\n\t -=-=-=-=-=-=-=-=-=- Pattern Selection -=-=-=-=-=-=-=-=-=-\n\n")
         option = input("\tDigite a opção de email a qual deseja enviar: \n"
                        + "[1] - E-mail para etapa 1 (pós-inscrição no PS);\n"
-                       + "[2] - E-mail  de lembrete etapa 1;\n"
+                       + "[2] - E-mail de lembrete etapa 1;\n"
                        + "[0] - Sair\n\n>>> ")
         
         try:
@@ -52,32 +87,14 @@ def send_email(your_email:str, app_key: str) -> None:
             print('\n\tPrograma encerrado com sucesso!\n\n')
             flag = 0
             
-        if int_option == 1:
+        elif int_option == 1:
             os.system('cls')
-            print('\n\tOpção selecionada: E-mail para a etapa 1\n\n')
-
-            dataframe = pd.read_csv('./docs/inscricoes.csv')
-            formated_dataframe = dataframe.drop(columns=['Carimbo de data/hora','Endereço de e-mail',
-                                                         '📞 Qual é o seu WhatsApp? (Contato de emergência)',
-                                                         '💡 Qual é o seu curso?',
-                                                         '🤔 É a sua primeira vez participando do processo seletivo?',
-                                                         '📄 Qual é o link do seu LinkedIn? (opcional)',
-                                                         '👁️ Como você ficou sabendo do PS?'])
             
-            full_name_list = []
-            nickname_list = []
-            email_list = []
-
-            for value in formated_dataframe.values:
-                for i, needed_value in enumerate(value):
-                    if i == 0:
-                        full_name_list.append(needed_value)
-                    
-                    if i == 1:
-                        nickname_list.append(needed_value)
-                    
-                    if i == 2:
-                        email_list.append(needed_value)
+            # Receiving the needed values
+            [fullname_list,
+             nickname_list,
+             email_list
+            ] = create_and_format_pattern1('./docs/inscricoes.csv')
 
             # -=-=-=-=-=-=-=- Creating the message and sending it! -=-=-=-=-=-=-=-
             your_password = f'{app_key}' # App-Key here
@@ -95,8 +112,62 @@ def send_email(your_email:str, app_key: str) -> None:
                 if not pd.isnull(nickname_list[i]):
                     body_message = realizacao_primeira_etapa(nickname_list[i])
                 else:
-                    body_message = realizacao_primeira_etapa(full_name_list[i])
+                    body_message = realizacao_primeira_etapa(fullname_list[i])
                 
+                # Specifying the kind of message content
+                message.attach(MIMEText(body_message, 'html'))
+
+                # Creating a MIMEApplication to attach an external document
+
+                file = r'./docs/Apresentacao.pdf'
+                with open(file, 'rb') as f:
+                    attachment = MIMEApplication(f.read(), _subtype='pdf')
+                
+                # Attaching the file
+                attachment.add_header('content_disposition', 'attachment', filename='Apresentação.pdf')
+                message.attach(attachment)
+
+                # Stablishing the connection
+                connection = smtplib.SMTP('smtp.gmail.com', 587)
+                connection.starttls()
+
+                # Logging in
+                connection.login(message['From'], your_password)
+
+                # Sending the e-mail
+                connection.sendmail(message['From'], message['To'], message.as_string())
+                
+                # Reseting the instance
+                del(message)
+
+                # Finishing the session
+                connection.quit()
+
+                print(f'Email enviado com sucesso para {email}')
+
+        elif int_option == 2:
+            os.system('cls')
+            print('\n\tOpção selecionada: Lembrete para etapa 1\n\n')
+
+            # Receiving the needed values
+            [fullname_list,
+             nickname_list,
+             email_list
+            ] = create_and_format_pattern1('./docs/inscricoes.csv')
+
+            # -=-=-=-=-=-=-=- Creating the message and sending it! -=-=-=-=-=-=-=-
+            your_password = f'{app_key}' # App-Key here
+
+            for i, email in enumerate(email_list):
+                message = MIMEMultipart() # Creation of an instance of MIMEMultipart Class
+                message['From'] = f'{your_email}' # Putting the email that you're working with
+                message['To'] = email # As we're iterating in a email list, the current one is the addressee
+                message['Subject'] = "Processo Seletivo 24.1 - Etapa 1" # Just put the subject here
+
+                # -=-=-=-=-=-=-=- Creating the body_message -=-=-=-=-=-=-=-
+
+                body_message = lembrete_primeira_etapa()
+
                 # Specifying the kind of message content
                 message.attach(MIMEText(body_message, 'html'))
 

@@ -40,7 +40,7 @@ def realizacao_primeira_etapa(nome_candidato: str) -> str:
     )
 
 # Texto de lembrete da primeira etapa
-def lembrete_primeira_etapa(nome_candidato: str) -> str:
+def lembrete_primeira_etapa() -> str:
     '''
     EN: Function that returns the body-text relative to the text reminder
     PT: Função que retorna o body-text relativo ao texto de lembrete
