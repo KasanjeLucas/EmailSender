@@ -93,5 +93,5 @@ else:
 
 
 ## Conclusion
-<p>This project is soooo specific to [@for_code](https://github.com/forcodeufrj) league, but the idea of the project can be used by anyone. So, if you want, fork the project and handle it to your own way.</p>
+<p>This project is soooo specific to for_code league, but the idea of the project can be used by anyone. So, if you want, fork the project and handle it to your own way.</p>
 <p>Furthermore, I'm so grateful to for_code by granting me these kind of challenges and tasks that can improve my knowledge.</p>
