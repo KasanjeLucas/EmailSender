@@ -88,6 +88,43 @@ else:
 <h4>Obs: Credits to MailsDaddy Software Channel</h4>
 <h4>PS²: The requirement of the Discord link was associated with the context that I was inserted in.</h4>
 
+<p>Then, by selecting any option, the connection will be made in a loop <kbd>for</kbd> (to send it individually) by the following code:</p>
+
+```sh
+for i, email in enumerate(email_list):
+  message = MIMEMultipart() # Creation of an instance of MIMEMultipart Class
+  message['From'] = f'{your_email}' # Putting the email that you're working with
+  message['To'] = email # As we're iterating in a email list, the current one is the addressee
+  message['Subject'] = "Processo Seletivo 24.1" # Just put the subject here
+
+# -=-=-=-=-=-=-=- Creating the body_message -=-=-=-=-=-=-=-
+
+  # Checking if the candidate has or not a nickname
+
+  if not pd.isnull(nickname_list[i]):
+    body_message = function_pattern(nickname_list[i]) # It will depend of what pattern was chosen
+  else:
+    body_message = function_pattern(fullname_list[i])
+                
+  # Specifying the kind of message content
+   message.attach(MIMEText(body_message, 'html'))
+
+  # Creating a MIMEApplication to attach an external document
+
+  file = r'./docs/Apresentacao.pdf'
+  with open(file, 'rb') as f:
+    attachment = MIMEApplication(f.read(), _subtype='pdf')
+                
+  # Attaching the file
+  attachment.add_header('content_disposition', 'attachment', filename='Apresentação.pdf')
+  message.attach(attachment)
+
+  # Making the connection
+  connect(your_email, your_password, message['To'], message)
+
+  print(f'Email enviado com sucesso para {email}')
+```
+
 ## Features
 <p>This project has the malleability to add other body_texts and options on the menu. To understand it, check the <kbd>patterns.py</kbd> module</p>
 
