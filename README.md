@@ -91,39 +91,32 @@ else:
 <p>Then, by selecting any option, the connection will be made in a loop <kbd>for</kbd> (to send it individually) by the following code:</p>
 
 ```sh
-for i, email in enumerate(email_list):
-  message = MIMEMultipart() # Creation of an instance of MIMEMultipart Class
-  message['From'] = f'{your_email}' # Putting the email that you're working with
-  message['To'] = email # As we're iterating in a email list, the current one is the addressee
-  message['Subject'] = "Processo Seletivo 24.1" # Just put the subject here
+def connect(email_login: str, password: str, adressee: str, message: MIMEMultipart) -> None:
+    '''
+    EN:
+    Function responsible for creating the connection and allowing the send of a e-mail message
+    PT:
+    Função responsável por criar a conexão e permitir o envio de uma mensagem de e-mail
+    '''
 
-# -=-=-=-=-=-=-=- Creating the body_message -=-=-=-=-=-=-=-
+    # Stablishing the connection
+    connection = smtplib.SMTP('smtp.gmail.com', 587)
+    connection.starttls()
 
-  # Checking if the candidate has or not a nickname
+    # Logging in
+    connection.login(email_login, password)
 
-  if not pd.isnull(nickname_list[i]):
-    body_message = function_pattern(nickname_list[i]) # It will depend of what pattern was chosen
-  else:
-    body_message = function_pattern(fullname_list[i])
+    # Sending the e-mail
+    connection.sendmail(email_login, adressee, message.as_string())
                 
-  # Specifying the kind of message content
-   message.attach(MIMEText(body_message, 'html'))
+    # Reseting the instance
+    del(message)
 
-  # Creating a MIMEApplication to attach an external document
-
-  file = r'./docs/Apresentacao.pdf'
-  with open(file, 'rb') as f:
-    attachment = MIMEApplication(f.read(), _subtype='pdf')
-                
-  # Attaching the file
-  attachment.add_header('content_disposition', 'attachment', filename='Apresentação.pdf')
-  message.attach(attachment)
-
-  # Making the connection
-  connect(your_email, your_password, message['To'], message)
-
-  print(f'Email enviado com sucesso para {email}')
+    # Finishing the session
+    connection.quit()
 ```
+
+<p>Notice that the port available with TLS to Gmail is <kbd>587</kbd>.</p>
 
 ## Features
 <p>This project has the malleability to add other body_texts and options on the menu. To understand it, check the <kbd>patterns.py</kbd> module</p>
