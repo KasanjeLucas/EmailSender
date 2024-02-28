@@ -41,6 +41,43 @@ def create_and_format_pattern(path: str) -> list:
     
     return [full_name_list, nickname_list, email_list]
 
+def create_and_format_pattern2(path: str) -> list:
+    '''
+    EN:
+    Function responsible to format the needed lists to send the fourth pattern of e-mail
+
+    PT:
+    Função responsável por formatar as listas necessárias para enviar o quarto padrão de e-mail
+    '''
+    dataframe = pd.read_csv(path)
+    formated_dataframe = dataframe.loc[:,['E-mail', 'Nome']]
+
+    full_name_list = formated_dataframe.iloc[:, 0].tolist()
+    email_list = formated_dataframe.iloc[:, 1].tolist()
+
+    return [full_name_list, email_list]
+
+def select_reasons(dataframe: pd.DataFrame) -> list:
+    '''
+    EN:
+    Function that fit together the reasons why the candidate was eliminated
+    PT:
+    Função que junta os motivos do porquê o candidato foi eliminado
+    '''
+
+    formated_dataframe = dataframe.drop(['E-mail','Nome'], axis=1)  # Remover as colunas 'E-mail' e 'Nome'
+
+    list_reasons = []
+
+    for _, row in formated_dataframe.iterrows():
+        reasons = []  # Inicializar uma lista vazia para armazenar os motivos desta linha
+        for content in row:
+            if not pd.isnull(content):
+                reasons.append(content)
+        list_reasons.append(reasons)  # Adicionar a lista de motivos desta linha à lista principal
+    
+    return list_reasons
+    
 def connect(email_login: str, password: str, adressee: str, message: MIMEMultipart) -> None:
     '''
     EN:
@@ -231,10 +268,9 @@ def send_email(your_email:str, app_key: str, discord_link:str) -> None:
             print('\n\tOpção selecionada: REPROVAÇÃO na etapa 1\n\n')
 
             # Receiving the needed values
-            [fullname_list,
-             nickname_list,
-             email_list
-            ] = create_and_format_pattern('./docs/spreadsheets/reprovados.csv') # arquivo
+            [email_list,
+             fullname_list
+            ] = create_and_format_pattern2('./docs/spreadsheets/Feedbacks.csv') # arquivo
 
             # -=-=-=-=-=-=-=- Creating the message and sending it! -=-=-=-=-=-=-=-
             your_password = f'{app_key}' # App-Key here
@@ -247,12 +283,8 @@ def send_email(your_email:str, app_key: str, discord_link:str) -> None:
             
             # -=-=-=-=-=-=-=- Creating the body_message -=-=-=-=-=-=-=-
 
-                 # Checking if the candidate has or not a nickname
-
-                if not pd.isnull(nickname_list[i]):
-                    body_message = reprovacao_primeira_etapa(nickname_list[i])
-                else:
-                    body_message = reprovacao_primeira_etapa(fullname_list[i])
+                lista_feedback = select_reasons(pd.read_csv('./docs/spreadsheets/Feedbacks.csv'))
+                body_message = reprovacao_primeira_etapa(fullname_list[i], lista_feedback[i])
 
                 # Specifying the kind of message content
                 message.attach(MIMEText(body_message, 'html'))

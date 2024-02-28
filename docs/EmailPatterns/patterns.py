@@ -7,10 +7,25 @@
     Módulo criado para definir os Padrões de E-mail que serão importados para as funções
     que enviam, de fato, os e-mails
 '''
-import base64
-
 LINK_STAGE01 = 'https://forms.gle/AWaCYXJK44j2z55AA' # Change the link when you need
 data_limite = '23/03/2024' # Put the correct date here
+
+def create_unordered_list(quantity: int, content: list) -> str:
+    '''
+    EN:
+    Function made to create an unordered list according to the quantity of bullet points specified
+    PT:
+    Função feita para criar uma lista não-ordenada de acordo com a quantidade de bullet points especificada
+    '''
+    items = []  # Initializes an empty list to store the unordered list items
+    for i in range(quantity):
+        items.append(f'<li>{content[i]}</li>')  # Adds each item to the list
+
+    # Joins all items in the unordered list into a single string
+    unordered_list = '<ul>' + ''.join(items) + '</ul>'
+    
+    return unordered_list  # Returns the complete unordered list as a string
+
 
 # Texto da primeira etapa
 def realizacao_primeira_etapa(nome_candidato: str) -> str:
@@ -60,6 +75,7 @@ def lembrete_primeira_etapa() -> str:
         '''
     )
 
+# Texto de aprovação na primeira etapa
 def aprovacao_primeira_etapa(nome_candidato: str, discord_link: str) -> str:
     '''
     EN: Function that returns the body-text relative to the approvement text
@@ -84,15 +100,18 @@ def aprovacao_primeira_etapa(nome_candidato: str, discord_link: str) -> str:
 
 ''')
 
-def reprovacao_primeira_etapa(nome_candidato: str) -> str:
+# Texto de reprovação na primeira etapa
+def reprovacao_primeira_etapa(nome_candidato: str, lista_feedback:list) -> str:
     '''
     EN: Function that returns the body-text relative to the reprobation text
     PT: Função que retorna o body-text relativo ao texto de reprovação na primeira etapa
     '''
+    feedback = create_unordered_list(len(lista_feedback), lista_feedback)
+    
     return (f'''
     <p>Olá, {nome_candidato}!! Esperamos que você esteja bem.</p>
     <p>A primeira etapa do nosso processo seletivo acabou e gostaríamos de falar que, infelizmente, não foi dessa vez... &#128546;</p>
     <p>Estamos mandando um feedback desse PS para que você possa ver seus pontos mais fracos e melhorá-los da próxima vez.</p>
-
+    {feedback}
     <p>Agradecemos a sua participação no nosso processo seletivo e estaremos te aguardando para o próximo! &#128156;</p> 
 ''')
