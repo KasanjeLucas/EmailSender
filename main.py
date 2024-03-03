@@ -9,4 +9,4 @@ from src.defs import send_email
 
 if __name__ == "__main__":
     #          Sender, Key-pass,  Discord Link
-    send_email('...', '...', 'https://github.com/KasanjeLucas')
+    send_email('', '', '')
