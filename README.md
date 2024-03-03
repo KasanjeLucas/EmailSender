@@ -88,6 +88,36 @@ else:
 <h4>Obs: Credits to MailsDaddy Software Channel</h4>
 <h4>PS²: The requirement of the Discord link was associated with the context that I was inserted in.</h4>
 
+<p>Then, by selecting any option, the connection will be made in a loop <kbd>for</kbd> (to send it individually) by the following code:</p>
+
+```sh
+def connect(email_login: str, password: str, adressee: str, message: MIMEMultipart) -> None:
+    '''
+    EN:
+    Function responsible for creating the connection and allowing the send of a e-mail message
+    PT:
+    Função responsável por criar a conexão e permitir o envio de uma mensagem de e-mail
+    '''
+
+    # Stablishing the connection
+    connection = smtplib.SMTP('smtp.gmail.com', 587)
+    connection.starttls()
+
+    # Logging in
+    connection.login(email_login, password)
+
+    # Sending the e-mail
+    connection.sendmail(email_login, adressee, message.as_string())
+                
+    # Reseting the instance
+    del(message)
+
+    # Finishing the session
+    connection.quit()
+```
+
+<p>Notice that the port available with TLS to Gmail is <kbd>587</kbd>.</p>
+
 ## Features
 <p>This project has the malleability to add other body_texts and options on the menu. To understand it, check the <kbd>patterns.py</kbd> module</p>
 
