@@ -80,52 +80,6 @@ def select_reasons(dataframe: pd.DataFrame) -> list:
         list_reasons.append(reasons)  # Adicionar a lista de motivos desta linha à lista principal
     
     return list_reasons
-
-def create_csv_of_sent_emails(list_emails: list, case: int) -> None:
-    '''
-    EN:
-    Function that create a csv file with the set of e-mails already sent
-    PT:
-    Função que cria um arquivo csv com o conjunto de e-mails já enviados
-    '''
-    data = {
-        'Endereço de e-mail': list_emails
-    }
-    emails = pd.DataFrame(data)
-
-    # Verify if file really doesn't exist
-    file_exists = os.path.isfile(f'./docs/spreadsheets/EmailsJaEnviados{case}.csv')
-
-    # If the file exists, get the number of lines, otherwise set it to 0
-    num_lines = pd.read_csv(f'./docs/spreadsheets/EmailsJaEnviados{case}.csv').shape[0] if file_exists else 0
-
-    if num_lines > 0:
-        # Write emails to CSV file without header
-        emails.to_csv(f'./docs/spreadsheets/EmailsJaEnviados{case}.csv', mode='a', index=False, header=False)
-    else:
-        # Write emails to CSV file with header
-        emails.to_csv(f'./docs/spreadsheets/EmailsJaEnviados{case}.csv', mode='w', index=False)
-
-def compare_csv_files(path_csv_file1: str, path_csv_file2:str) -> list:
-    '''
-    Obs.: Put the "only e-mail" csv file on the second parameter
-    EN:
-    Function that compare csv files and recognize if we need to sent the message for the email or not
-    PT:
-    Função que compara arquivos csv e reconhce se precisamos enviar a mensagem para o email ou não
-    '''
-    
-    df1 = pd.read_csv(path_csv_file1)
-    df2 = pd.read_csv(path_csv_file2)
-
-    # Convert email columns from dataframes to email sets
-    emails_set1 = set(df1['Endereço de e-mail'])
-    emails_set2 = set(df2['Endereço de e-mail'])
-
-    # Find emails that are in the second file but not in the first
-    emails_not_in_file1 = list(emails_set2 - emails_set1)
-
-    return emails_not_in_file1
     
 def connect(email_login: str, password: str, adressee: str, message: MIMEMultipart) -> None:
     '''
@@ -192,102 +146,48 @@ def send_email(your_email:str, app_key: str, discord_link:str) -> None:
         elif int_option == 1:
             os.system('cls')
 
-            file_exists = os.path.isfile('./docs/spreadsheets/EmailsJaEnviados1.csv')
-            
-            if file_exists:
             # Receiving the needed values
-                [fullname_list,
-                nickname_list,
-                email_list # this one will be changed
-                ] = create_and_format_pattern('./docs/spreadsheets/inscricoes.csv')
+            [fullname_list,
+            nickname_list,
+            email_list # this one will be changed
+            ] = create_and_format_pattern('./docs/spreadsheets/inscricoes.csv')
 
-                email_list = compare_csv_files('./docs/spreadsheets/inscricoes.csv', './docs/spreadsheets/EmailsJaEnviados1.csv')
+            # -=-=-=-=-=-=-=- Creating the message and sending it! -=-=-=-=-=-=-=-
+            your_password = f'{app_key}' # App-Key here
 
-                if not (len(email_list) == 0):
-                    # -=-=-=-=-=-=-=- Creating the message and sending it! -=-=-=-=-=-=-=-
-                    your_password = f'{app_key}' # App-Key here
+            for i, email in enumerate(email_list):
+                message = MIMEMultipart() # Creation of an instance of MIMEMultipart Class
+                message['From'] = f'{your_email}' # Putting the email that you're working with
+                message['To'] = email # As we're iterating in a email list, the current one is the addressee
+                message['Subject'] = "Processo Seletivo 24.1" # Just put the subject here
 
-                    for i, email in enumerate(email_list):
-                        message = MIMEMultipart() # Creation of an instance of MIMEMultipart Class
-                        message['From'] = f'{your_email}' # Putting the email that you're working with
-                        message['To'] = email # As we're iterating in a email list, the current one is the addressee
-                        message['Subject'] = "Processo Seletivo 24.1" # Just put the subject here
+                # -=-=-=-=-=-=-=- Creating the body_message -=-=-=-=-=-=-=-
 
-                        # -=-=-=-=-=-=-=- Creating the body_message -=-=-=-=-=-=-=-
+                # Checking if the candidate has or not a nickname
 
-                        # Checking if the candidate has or not a nickname
-
-                        if not pd.isnull(nickname_list[i]):
-                            body_message = realizacao_primeira_etapa(nickname_list[i])
-                        else:
-                            body_message = realizacao_primeira_etapa(fullname_list[i])
-                        
-                        # Specifying the kind of message content
-                        message.attach(MIMEText(body_message, 'html'))
-
-                        # Creating a MIMEApplication to attach an external document
-
-                        file = r'./docs/Apresentacao.pdf'
-                        with open(file, 'rb') as f:
-                            attachment = MIMEApplication(f.read(), _subtype='pdf')
-                        
-                        # Attaching the file
-                        attachment.add_header('content_disposition', 'attachment', filename='Apresentação.pdf')
-                        message.attach(attachment)
-
-                        # Making the connection
-                        connect(your_email, your_password, message['To'], message)
-
-                        print(f'Email enviado com sucesso para {email}')
-                
+                if not pd.isnull(nickname_list[i]):
+                    body_message = realizacao_primeira_etapa(nickname_list[i])
                 else:
-                    os.system('cls')
-                    print('A lista de e-mails selecionada já foi utilizada por completo anteriormente!')
-                    continue
+                    body_message = realizacao_primeira_etapa(fullname_list[i])
+                        
+                # Specifying the kind of message content
+                message.attach(MIMEText(body_message, 'html'))
+
+                # Creating a MIMEApplication to attach an external document
+
+                file = r'./docs/Apresentacao.pdf'
+                with open(file, 'rb') as f:
+                    attachment = MIMEApplication(f.read(), _subtype='pdf')
+                        
+                # Attaching the file
+                attachment.add_header('content_disposition', 'attachment', filename='Apresentação da liga.pdf')
+                message.attach(attachment)
+
+                # Making the connection
+                connect(your_email, your_password, message['To'], message)
+
+                print(f'Email enviado com sucesso para {email}')
             
-            else:
-                # Receiving the needed values
-                [fullname_list,
-                nickname_list,
-                email_list # this one will be changed
-                ] = create_and_format_pattern('./docs/spreadsheets/inscricoes.csv')
-
-                create_csv_of_sent_emails(email_list, 1)
-
-                your_password = f'{app_key}' # App-Key here
-
-                for i, email in enumerate(email_list):
-                    message = MIMEMultipart() # Creation of an instance of MIMEMultipart Class
-                    message['From'] = f'{your_email}' # Putting the email that you're working with
-                    message['To'] = email # As we're iterating in a email list, the current one is the addressee
-                    message['Subject'] = "Processo Seletivo 24.1" # Just put the subject here
-
-                    # -=-=-=-=-=-=-=- Creating the body_message -=-=-=-=-=-=-=-
-
-                    # Checking if the candidate has or not a nickname
-
-                    if not pd.isnull(nickname_list[i]):
-                        body_message = realizacao_primeira_etapa(nickname_list[i])
-                    else:
-                        body_message = realizacao_primeira_etapa(fullname_list[i])
-                    
-                    # Specifying the kind of message content
-                    message.attach(MIMEText(body_message, 'html'))
-
-                    # Creating a MIMEApplication to attach an external document
-
-                    file = r'./docs/Apresentacao.pdf'
-                    with open(file, 'rb') as f:
-                        attachment = MIMEApplication(f.read(), _subtype='pdf')
-                    
-                    # Attaching the file
-                    attachment.add_header('content_disposition', 'attachment', filename='Apresentação.pdf')
-                    message.attach(attachment)
-
-                    # Making the connection
-                    connect(your_email, your_password, message['To'], message)
-
-                    print(f'Email enviado com sucesso para {email}')
 
         elif int_option == 2:
             os.system('cls')
@@ -334,83 +234,38 @@ def send_email(your_email:str, app_key: str, discord_link:str) -> None:
             os.system('cls')
             print('\n\tOpção selecionada: APROVAÇÃO na etapa 1\n\n')
 
-            file_exists = os.path.isfile('./docs/spreadsheets/EmailsJaEnviados2.csv')
-
-            if file_exists:
             # Receiving the needed values
-                [fullname_list,
-                nickname_list,
-                email_list # this one will be changed
-                ] = create_and_format_pattern('./docs/spreadsheets/aprovados.csv')
+            [fullname_list,
+            nickname_list,
+            email_list # this one will be changed
+            ] = create_and_format_pattern('./docs/spreadsheets/aprovados.csv')
 
-                email_list = compare_csv_files('./docs/spreadsheets/aprovados.csv', './docs/spreadsheets/EmailsJaEnviados2.csv')
+            # -=-=-=-=-=-=-=- Creating the message and sending it! -=-=-=-=-=-=-=-
+            your_password = f'{app_key}' # App-Key here
 
-                if not (len(email_list) == 0):
-                    # -=-=-=-=-=-=-=- Creating the message and sending it! -=-=-=-=-=-=-=-
-                    your_password = f'{app_key}' # App-Key here
-
-                    for i, email in enumerate(email_list):
-                        message = MIMEMultipart() # Creation of an instance of MIMEMultipart Class
-                        message['From'] = f'{your_email}' # Putting the email that you're working with
-                        message['To'] = email # As we're iterating in a email list, the current one is the addressee
-                        message['Subject'] = "PS for_code - Resultado da 1a etapa" # Just put the subject here
+            for i, email in enumerate(email_list):
+                message = MIMEMultipart() # Creation of an instance of MIMEMultipart Class
+                message['From'] = f'{your_email}' # Putting the email that you're working with
+                message['To'] = email # As we're iterating in a email list, the current one is the addressee
+                message['Subject'] = "PS for_code - Resultado da 1a etapa" # Just put the subject here
                     
-                    # -=-=-=-=-=-=-=- Creating the body_message -=-=-=-=-=-=-=-
+            # -=-=-=-=-=-=-=- Creating the body_message -=-=-=-=-=-=-=-
 
-                        # Checking if the candidate has or not a nickname
+                # Checking if the candidate has or not a nickname
 
-                        if not pd.isnull(nickname_list[i]):
-                            body_message = aprovacao_primeira_etapa(nickname_list[i], f'{discord_link}')
-                        else:
-                            body_message = aprovacao_primeira_etapa(fullname_list[i], f'{discord_link}')
-
-                        # Specifying the kind of message content
-                        message.attach(MIMEText(body_message, 'html'))
-
-                        # Making the connection
-                        connect(your_email, your_password, message['To'], message)
-
-                        print(f'Email enviado com sucesso para {email}')
-                
+                if not pd.isnull(nickname_list[i]):
+                    body_message = aprovacao_primeira_etapa(nickname_list[i], f'{discord_link}')
                 else:
-                    os.system('cls')
-                    print('A lista de e-mails selecionada já foi utilizada por completo anteriormente!')
-                    continue
+                    body_message = aprovacao_primeira_etapa(fullname_list[i], f'{discord_link}')
+
+                # Specifying the kind of message content
+                message.attach(MIMEText(body_message, 'html'))
+
+                # Making the connection
+                connect(your_email, your_password, message['To'], message)
+
+                print(f'Email enviado com sucesso para {email}')
             
-            else:
-                # Receiving the needed values
-                [fullname_list,
-                nickname_list,
-                email_list # this one will be changed
-                ] = create_and_format_pattern('./docs/spreadsheets/aprovados.csv')
-
-                create_csv_of_sent_emails(email_list, 2)
-
-                your_password = f'{app_key}' # App-Key here
-
-                for i, email in enumerate(email_list):
-                    message = MIMEMultipart() # Creation of an instance of MIMEMultipart Class
-                    message['From'] = f'{your_email}' # Putting the email that you're working with
-                    message['To'] = email # As we're iterating in a email list, the current one is the addressee
-                    message['Subject'] = "PS for_code - Resultado da 1a etapa" # Just put the subject here
-                    
-                # -=-=-=-=-=-=-=- Creating the body_message -=-=-=-=-=-=-=-
-
-                    # Checking if the candidate has or not a nickname
-
-                    if not pd.isnull(nickname_list[i]):
-                         body_message = aprovacao_primeira_etapa(nickname_list[i], f'{discord_link}')
-                    else:
-                        body_message = aprovacao_primeira_etapa(fullname_list[i], f'{discord_link}')
-
-                    # Specifying the kind of message content
-                    message.attach(MIMEText(body_message, 'html'))
-
-                    # Making the connection
-                    connect(your_email, your_password, message['To'], message)
-
-                    print(f'Email enviado com sucesso para {email}')
-
         elif int_option == 4:
 
             os.system('cls')
@@ -423,43 +278,6 @@ def send_email(your_email:str, app_key: str, discord_link:str) -> None:
                 [email_list, # this one will be changed
                 fullname_list
                 ] = create_and_format_pattern2('./docs/spreadsheets/Feedbacks.csv') # arquivo
-
-                email_list = compare_csv_files('./docs/spreadsheets/Feedbacks.csv', './docs/spreadsheets/EmailsJaEnviados3.csv')
-
-                if not (len(email_list) == 0):
-                    # -=-=-=-=-=-=-=- Creating the message and sending it! -=-=-=-=-=-=-=-
-                    your_password = f'{app_key}' # App-Key here
-
-                    for i, email in enumerate(email_list):
-                        message = MIMEMultipart() # Creation of an instance of MIMEMultipart Class
-                        message['From'] = f'{your_email}' # Putting the email that you're working with
-                        message['To'] = email # As we're iterating in a email list, the current one is the addressee
-                        message['Subject'] = "PS for_code - Resultado da 1a etapa" # Just put the subject here
-                    
-                    # -=-=-=-=-=-=-=- Creating the body_message -=-=-=-=-=-=-=-
-
-                        lista_feedback = select_reasons(pd.read_csv('./docs/spreadsheets/Feedbacks.csv'))
-                        body_message = reprovacao_primeira_etapa(fullname_list[i], lista_feedback[i])
-
-                        # Specifying the kind of message content
-                        message.attach(MIMEText(body_message, 'html'))
-
-                        # Making the connection
-                        connect(your_email, your_password, message['To'], message)
-
-                        print(f'Email enviado com sucesso para {email}')
-                
-                else:
-                    os.system('cls')
-                    print('A lista de e-mails selecionada já foi utilizada por completo anteriormente!')
-                    continue
-            else:
-                # Receiving the needed values
-                [email_list,
-                fullname_list
-                ] = create_and_format_pattern2('./docs/spreadsheets/Feedbacks.csv') # arquivo
-
-                create_csv_of_sent_emails(email_list, 3)
 
                 # -=-=-=-=-=-=-=- Creating the message and sending it! -=-=-=-=-=-=-=-
                 your_password = f'{app_key}' # App-Key here
